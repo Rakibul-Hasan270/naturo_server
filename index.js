@@ -24,9 +24,34 @@ async function run() {
     try {
         await client.connect();
 
-        const userCollection = client.db("zestora_restaurant_new").collection('users');
-        
-        
+            const itemCollection = client.db("naturo_db").collection('items');
+
+        app.get('/items', async (req, res) => {
+            const result = await itemCollection.find().toArray();
+            res.send(result);
+        })
+
+        app.get('/items/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) };
+            const result = await itemCollection.findOne(query);
+            if (!result) {
+                return res.status(404).send({ message: "Item not found" });
+            }
+            res.send(result);
+        })
+
+        app.get('/categorys/:category', async (req, res) => {
+            const category = req.params.category;
+            const query = { category: category };
+            const result = await itemCollection.find(query).toArray();
+            if (!result) {
+                return res.status(404).send({ message: "Item not found" });
+            }
+            res.send(result);
+        })
+
+
         await client.db("admin").command({ ping: 1 });
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
     } finally { }
@@ -35,9 +60,9 @@ run().catch(console.dir);
 
 
 app.get('/', (req, res) => {
-    res.send('restaurant is open');
+    res.send('natero is open');
 })
 
 app.listen(port, () => {
-    console.log(`Zestora runing on port ${port}`);
+    console.log(`Natero runing on port ${port}`);
 })
