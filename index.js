@@ -24,6 +24,7 @@ async function run() {
         await client.connect();
 
         const itemCollection = client.db("naturo_db").collection('items');
+        const orderCollection = client.db("naturo_db").collection('orders');
 
         // items related apis 
         app.get('/items', async (req, res) => {
@@ -92,13 +93,18 @@ async function run() {
             res.send(result);
         })
 
+        // order related apis 
+        app.post('/order', async (req, res) => {
+            const orderInfo = req.body;
+            const result = await orderCollection.insertOne(orderInfo);
+            res.send(result);
+        })
 
         await client.db("admin").command({ ping: 1 });
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
     } finally { }
 }
 run().catch(console.dir);
-
 
 app.get('/', (req, res) => {
     res.send('natero is open');
